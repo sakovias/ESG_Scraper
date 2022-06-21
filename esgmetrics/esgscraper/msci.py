@@ -3,7 +3,7 @@ MSCI website Scrape
 
 This script allows the user to scrape the companies' ESG ratings from the MSCI
 website. Website link:
-"https://www.msci.com/our-solutions/esg-investing/esg-ratings/esg-ratings-corporate-search-tool/"
+"https://www.msci.com/research-and-insights/esg-ratings-corporate-search-tool"
 
 This tool accepts Company's names list in comma separated value
 file (.csv) format as input.
@@ -53,13 +53,11 @@ df = pd.read_csv(companies_filename)
 data_length = len(df)
 
 # Set up the webdriver
-URL = "https://www.msci.com/our-solutions/esg-investing/esg-ratings/esg\
-        -ratings-corporate-search-tool/"
+URL = "https://www.msci.com/research-and-insights/esg-ratings-corporate-search-tool"
 bot = WebScraper(URL)
 
 # Accept cookies on the website
-cookies_xpath = '//*[@id="portlet_mscicookiebar_WAR_mscicookiebar"]/div/div[2]/ \
-                div/div/div[1]/div/button[1]'
+cookies_xpath = '//*[@id="onetrust-accept-btn-handler"]'
 bot.accept_cookies(cookies_xpath)
 
 # Extract company names and their ESG score and store it in the dictionary
