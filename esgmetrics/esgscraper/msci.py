@@ -18,32 +18,38 @@ import pandas as pd
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 from time import sleep
-from tqdm import tqdm
+#from tqdm import tqdm
 from .scraper import WebScraper
+import traceback
 
 
-def _append_dict(temp: str) -> str:
-    ''' Append the MSCI dictionary with Company Name and its MSCI ESG rating
+def get_esg_score(bot, header_name, df, i):
+    # Starting the search by finding the search bar & searching for the company
+    search_bar = bot.send_request_to_search_bar(
+        header_name, df, i, xpath='//*[@id="_esgratingsprofile_keywords"]')
+    search_bar.send_keys(Keys.DOWN, Keys.RETURN)
+    sleep(4)
 
-    Parameters
-    ----------
-    temp : str
-    The previous company name appended to the dictionary
+    xpath = '//*[@id="_esgratingsprofile_esg-ratings-profile-header"]/div[1]/div[1]/div[2]/div[1]'
+    esg_score_element = bot.find_element(xpath)
+    esg_score = esg_score_element.get_attribute('class').split('-')[-1].upper()
+    print('score', esg_score)
 
-    Returns
-    -------
-    str
-            The latest company name appended to the dictionary
-    '''
-    if temp == company:
-        bot.append_empty_values(msci)
+    company_msci_name = bot.find_element('//*[@class="header-company-title"]').text
+    return {
+        'MSCI_Company': [company_msci_name],
+        'MSCI_ESG': [esg_score]
+    }
 
-    else:
-        msci['MSCI_Company'].append(company.text)
-        msci['MSCI_ESG'].append(esg_score.get_attribute('class'))
-        temp = company
-    return temp
+def init_bot():
+    # Set up the webdriver
+    URL = "https://www.msci.com/research-and-insights/esg-ratings-corporate-search-tool"
+    bot = WebScraper(URL)
 
+    # Accept cookies on the website
+    cookies_xpath = '//*[@id="onetrust-accept-btn-handler"]'
+    bot.accept_cookies(cookies_xpath)
+    return bot
 
 # Read input companies dataset
 companies_filename = WebScraper._get_filename()
@@ -52,33 +58,34 @@ export_path = WebScraper._get_exportpath()
 df = pd.read_csv(companies_filename)
 data_length = len(df)
 
-# Set up the webdriver
-URL = "https://www.msci.com/research-and-insights/esg-ratings-corporate-search-tool"
-bot = WebScraper(URL)
-
-# Accept cookies on the website
-cookies_xpath = '//*[@id="onetrust-accept-btn-handler"]'
-bot.accept_cookies(cookies_xpath)
+bot = init_bot()
 
 # Extract company names and their ESG score and store it in the dictionary
-temp = 0
-for i in tqdm(range(data_length)):
-    msci = {'MSCI_Company': [], 'MSCI_ESG': []}
-    # Starting the search by finding the search bar & searching for the company
-    search_bar = bot.send_request_to_search_bar(
-        header_name, df, i, xpath='//*[@id="_esgratingsprofile_keywords"]')
-    search_bar.send_keys(Keys.DOWN, Keys.RETURN)
-    sleep(4)
-
+for i in range(data_length):
+    company = df.loc[i][header_name]
+    print('processing', i, 'of', data_length, company)
     try:
-        xpath = '//*[@id="_esgratingsprofile_esg-ratings-profile-header"]/div[2]/div[1]/div[2]/div'
-        esg_score = bot.find_element(xpath)
-        company = bot.find_element(
-            '//*[@id="_esgratingsprofile_esg-ratings-profile-header"]/div[1]/div[1]')
-        temp = _append_dict(temp)
+        msci_data = get_esg_score(bot, header_name, df, i)
+        # Save the data into a csv file
+        bot.convert_dict_to_csv(msci_data, export_path)
+    except Exception as e:
+        print('Failed on', company)
+        print('Exception', e.__class__.__name__, e)
+        traceback.print_exc()
+        bot.take_screenshot()
 
-    except NoSuchElementException:
-        bot.append_empty_values(msci)
+        # try closing the customer intake modal
+        try:
+            bot.try_closing_modal('//*[@class="yui3-widget-hd modal-header"]//div[1]//button')
+            
+            # reinstantiate bot
+            bot = init_bot()
+            msci_data = get_esg_score(bot, header_name, df, i)
+            # Save the data into a csv file
+            bot.convert_dict_to_csv(msci_data, export_path)
+        except Exception as e:
+            print('Yet another exception', e.__class__.__name__, e)
+            traceback.print_exc()
+            break
+        
 
-    # Save the data into a csv file
-    df1 = bot.convert_dict_to_csv(msci, export_path)
