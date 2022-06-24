@@ -41,10 +41,10 @@ def get_esg_score(bot, header_name, df, i):
         'MSCI_ESG': [esg_score]
     }
 
-def init_bot():
+def init_bot(chrome_path):
     # Set up the webdriver
     URL = "https://www.msci.com/research-and-insights/esg-ratings-corporate-search-tool"
-    bot = WebScraper(URL)
+    bot = WebScraper(URL, chrome_path)
 
     # Accept cookies on the website
     cookies_xpath = '//*[@id="onetrust-accept-btn-handler"]'
@@ -58,7 +58,8 @@ export_path = WebScraper._get_exportpath()
 df = pd.read_csv(companies_filename)
 data_length = len(df)
 
-bot = init_bot()
+chrome_path = input('Please specify the chromedriver path : ')
+bot = init_bot(chrome_path)
 
 # Extract company names and their ESG score and store it in the dictionary
 for i in range(data_length):
@@ -68,6 +69,7 @@ for i in range(data_length):
         msci_data = get_esg_score(bot, header_name, df, i)
         # Save the data into a csv file
         bot.convert_dict_to_csv(msci_data, export_path)
+
     except Exception as e:
         print('Failed on', company)
         print('Exception', e.__class__.__name__, e)
@@ -79,7 +81,7 @@ for i in range(data_length):
             bot.try_closing_modal('//*[@class="yui3-widget-hd modal-header"]//div[1]//button')
             
             # reinstantiate bot
-            bot = init_bot()
+            bot = init_bot(chrome_path)
             msci_data = get_esg_score(bot, header_name, df, i)
             # Save the data into a csv file
             bot.convert_dict_to_csv(msci_data, export_path)

@@ -25,7 +25,7 @@ class WebScraper():
         URL (str): The website URL.
     '''
 
-    def __init__(self, URL: str):
+    def __init__(self, URL: str, chrome_path: str):
         '''
         See help(scraper) for accurate signature
         '''
@@ -35,9 +35,10 @@ class WebScraper():
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         #self.chrome_path = 'C:\\Users\\sakov\\Apps\\ChromeDriver\\chromedriver.exe' #input('Please specify the chromedriver path : ')
-        self.chrome_path = input('Please specify the chromedriver path : ')
+        if not chrome_path:
+            chrome_path = input('Please specify the chromedriver path : ')
         self.driver = webdriver.Chrome(
-            executable_path=self.chrome_path, options=options)
+            executable_path=chrome_path, options=options)
         self.driver.get(URL)
         sleep(2)
 
