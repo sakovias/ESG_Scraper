@@ -161,21 +161,21 @@ class WebScraper():
         cookies_button.click()
         sleep(2)
 
-    def try_closing_modal(self, xpath: str):
-        '''
-        This function clicks on a cross button to close customer intake form modal
+    # def try_closing_modal(self, xpath: str):
+    #     '''
+    #     This function clicks on a cross button to close customer intake form modal
 
-        Args:
-            xpath (str): The xpath of the 'close' button
-        '''
-        try:
-            button = self.driver.find_element_by_xpath(xpath)
-            WebScraper.wait_element_to_load(self, xpath)
-            button.click()
-            sleep(2)
+    #     Args:
+    #         xpath (str): The xpath of the 'close' button
+    #     '''
+    #     try:
+    #         button = self.driver.find_element_by_xpath(xpath)
+    #         WebScraper.wait_element_to_load(self, xpath)
+    #         button.click()
+    #         sleep(2)
 
-        except NoSuchElementException:
-            pass
+    #     except NoSuchElementException:
+    #         pass
 
     @staticmethod
     def convert_dict_to_csv(dict_name: str, export_path: str) -> pd.DataFrame:
@@ -286,4 +286,6 @@ class WebScraper():
 
     def take_screenshot(self):
         body = self.driver.find_element_by_tag_name('body')
-        body.screenshot('..\\SCREENSHOT {}.png'.format(str(datetime.now())))
+        timestamp = str(datetime.now())
+        print('Taking screenshot at', timestamp)
+        body.screenshot('..\\..\\SCREENSHOT_{}.png'.format(timestamp))

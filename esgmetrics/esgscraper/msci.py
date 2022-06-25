@@ -33,12 +33,18 @@ def get_esg_score(bot, header_name, df, i):
     xpath = '//*[@id="_esgratingsprofile_esg-ratings-profile-header"]/div[1]/div[1]/div[2]/div[1]'
     esg_score_element = bot.find_element(xpath)
     esg_score = esg_score_element.get_attribute('class').split('-')[-1].upper()
-    print('score', esg_score)
 
     company_msci_name = bot.find_element('//*[@class="header-company-title"]').text
+    print('company', company_msci_name, 'score', esg_score)
     return {
         'MSCI_Company': [company_msci_name],
         'MSCI_ESG': [esg_score]
+    }
+
+def get_failed_esg_score(company):
+    return {
+        'MSCI_Company': [company],
+        'MSCI_ESG': ['failed']
     }
 
 def init_bot(chrome_path):
@@ -76,9 +82,9 @@ for i in range(data_length):
         traceback.print_exc()
         bot.take_screenshot()
 
-        # try closing the customer intake modal
         try:
-            bot.try_closing_modal('//*[@class="yui3-widget-hd modal-header"]//div[1]//button')
+            # try closing the customer intake modal
+            #bot.try_closing_modal('//*[@class="yui3-widget-hd modal-header"]//div[1]//button')
             
             # reinstantiate bot
             bot = init_bot(chrome_path)
@@ -88,6 +94,8 @@ for i in range(data_length):
         except Exception as e:
             print('Yet another exception', e.__class__.__name__, e)
             traceback.print_exc()
-            break
+            bot.take_screenshot()
+            bot = init_bot(chrome_path)
+            bot.get_failed_esg_score(company)
         
 
