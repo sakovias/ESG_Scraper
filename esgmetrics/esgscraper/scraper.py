@@ -24,7 +24,7 @@ class WebScraper():
         URL (str): The website URL.
     '''
 
-    def __init__(self, URL: str):
+    def __init__(self, URL: str, chrome_path: str):
         '''
         See help(scraper) for accurate signature
         '''
@@ -33,9 +33,10 @@ class WebScraper():
         options.add_argument("--headless")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
-        self.chrome_path = input('Please specify the chromedriver path : ')
+        if not chrome_path:
+            chrome_path = input('Please specify the chromedriver path : ')
         self.driver = webdriver.Chrome(
-            executable_path=self.chrome_path, options=options)
+            executable_path=chrome_path, options=options)
         self.driver.get(URL)
         sleep(2)
 
@@ -135,7 +136,7 @@ class WebScraper():
             webpage
 
         '''
-        delay = 10  # seconds
+        delay = 5  # seconds
         ignored_exceptions = (NoSuchElementException,
                               StaleElementReferenceException,)
         try:
@@ -264,3 +265,8 @@ class WebScraper():
         bot = WebScraper(self.URL)
         bot.accept_cookies(cookies_xpath)
         return bot
+
+    def take_screenshot(self):
+        body = self.driver.find_element_by_tag_name('body')
+        print('Taking screenshot')
+        body.screenshot('..\\..\\ESG_SCREENSHOT.png')
