@@ -47,6 +47,12 @@ def get_failed_esg_score(company):
         'MSCI_ESG': ['failed']
     }
 
+def get_unavailable_esg_score(company):
+    return {
+        'MSCI_Company': [company],
+        'MSCI_ESG': ['unavailable']
+    }   
+
 def init_bot(chrome_path):
     # Set up the webdriver
     URL = "https://www.msci.com/research-and-insights/esg-ratings-corporate-search-tool"
@@ -68,11 +74,19 @@ chrome_path = input('Please specify the chromedriver path : ')
 bot = init_bot(chrome_path)
 
 # Extract company names and their ESG score and store it in the dictionary
+prev_msci_company_name = None
 for i in range(data_length):
     company = df.loc[i][header_name]
     print('processing', i, 'of', data_length, company)
     try:
         msci_data = get_esg_score(bot, header_name, df, i)
+        msci_company_name = msci_data['MSCI_Company'][0]
+        if msci_company_name == prev_msci_company_name:
+            print('Could not find data for', company)
+            msci_data = get_unavailable_esg_score(company)
+        else:
+            prev_msci_company_name = msci_company_name
+
         # Save the data into a csv file
         bot.convert_dict_to_csv(msci_data, export_path)
 
@@ -96,6 +110,7 @@ for i in range(data_length):
             traceback.print_exc()
             bot.take_screenshot()
             bot = init_bot(chrome_path)
-            bot.get_failed_esg_score(company)
-        
+            msci_data = get_failed_esg_score(company)
+            # Save the data into a csv file
+            bot.convert_dict_to_csv(msci_data, export_path)
 

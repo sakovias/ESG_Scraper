@@ -11,7 +11,6 @@ from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.remote.webelement import WebElement
 from time import sleep
-from datetime import datetime
 import os
 import pkg_resources
 
@@ -286,6 +285,5 @@ class WebScraper():
 
     def take_screenshot(self):
         body = self.driver.find_element_by_tag_name('body')
-        timestamp = str(datetime.now())
-        print('Taking screenshot at', timestamp)
-        body.screenshot('..\\..\\SCREENSHOT_{}.png'.format(timestamp))
+        print('Taking screenshot')
+        body.screenshot('..\\..\\ESG_SCREENSHOT.png')
