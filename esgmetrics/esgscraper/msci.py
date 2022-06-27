@@ -18,7 +18,6 @@ import pandas as pd
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 from time import sleep
-#from tqdm import tqdm
 from .scraper import WebScraper
 import traceback
 
@@ -97,9 +96,6 @@ for i in range(data_length):
         bot.take_screenshot()
 
         try:
-            # try closing the customer intake modal
-            #bot.try_closing_modal('//*[@class="yui3-widget-hd modal-header"]//div[1]//button')
-            
             # reinstantiate bot
             bot = init_bot(chrome_path)
             msci_data = get_esg_score(bot, header_name, df, i)

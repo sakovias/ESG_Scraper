@@ -33,7 +33,6 @@ class WebScraper():
         options.add_argument("--headless")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
-        #self.chrome_path = 'C:\\Users\\sakov\\Apps\\ChromeDriver\\chromedriver.exe' #input('Please specify the chromedriver path : ')
         if not chrome_path:
             chrome_path = input('Please specify the chromedriver path : ')
         self.driver = webdriver.Chrome(
@@ -159,22 +158,6 @@ class WebScraper():
         WebScraper.wait_element_to_load(self, xpath)
         cookies_button.click()
         sleep(2)
-
-    # def try_closing_modal(self, xpath: str):
-    #     '''
-    #     This function clicks on a cross button to close customer intake form modal
-
-    #     Args:
-    #         xpath (str): The xpath of the 'close' button
-    #     '''
-    #     try:
-    #         button = self.driver.find_element_by_xpath(xpath)
-    #         WebScraper.wait_element_to_load(self, xpath)
-    #         button.click()
-    #         sleep(2)
-
-    #     except NoSuchElementException:
-    #         pass
 
     @staticmethod
     def convert_dict_to_csv(dict_name: str, export_path: str) -> pd.DataFrame:
