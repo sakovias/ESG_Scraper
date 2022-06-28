@@ -17,7 +17,7 @@ setup(
     author_email='shweta.yadav2092@gmail.com',
     license='MIT',
     packages=find_packages(),
-    install_requires=['selenium', 'pandas', 'tqdm', 'sqlalchemy'],
+    install_requires=['selenium', 'pandas', 'tqdm', 'sqlalchemy', 'unidecode'],
     include_package_data=True,
     package_data={'': ['data/*.csv']}
 )

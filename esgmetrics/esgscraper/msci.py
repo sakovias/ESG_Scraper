@@ -20,6 +20,7 @@ from selenium.webdriver.common.keys import Keys
 from time import sleep
 from .scraper import WebScraper
 import traceback
+import unidecode
 
 
 def get_esg_score(bot, header_name, df, i):
@@ -75,7 +76,7 @@ bot = init_bot(chrome_path)
 # Extract company names and their ESG score and store it in the dictionary
 prev_msci_company_name = None
 for i in range(data_length):
-    company = df.loc[i][header_name]
+    company = unidecode.unidecode(df.loc[i][header_name])
     print('processing', i, 'of', data_length, company)
     try:
         msci_data = get_esg_score(bot, header_name, df, i)
@@ -92,8 +93,6 @@ for i in range(data_length):
     except Exception as e:
         print('Failed on', company)
         print('Exception', e.__class__.__name__, e)
-        traceback.print_exc()
-        bot.take_screenshot()
 
         try:
             # reinstantiate bot

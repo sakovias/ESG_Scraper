@@ -13,6 +13,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from time import sleep
 import os
 import pkg_resources
+import unidecode
 
 
 class WebScraper():
@@ -241,7 +242,7 @@ class WebScraper():
         Returns:
             WebElement: webelement of the search bar
         '''
-        Company = str(df.loc[i][header_name])
+        Company = unidecode.unidecode(df.loc[i][header_name])
         search_bar = WebScraper.find_element(self, xpath, class_name)
         search_bar.clear()
         search_bar = WebScraper.find_element(self, xpath, class_name)
@@ -269,4 +270,4 @@ class WebScraper():
     def take_screenshot(self):
         body = self.driver.find_element_by_tag_name('body')
         print('Taking screenshot')
-        body.screenshot('..\\..\\ESG_SCREENSHOT.png')
+        body.screenshot('..\\ESG_SCREENSHOT.png')
